@@ -216,7 +216,7 @@
                         aria-required="true"
                         aria-invalid={!!error}
                         aria-describedby={error ? `${name}-error` : hint ? `${name}-hint` : undefined}
-                        className={"w-full min-w-0 pl-10 pr-4 py-2.5 bg-slate-800/50 border rounded-xl text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-sm hover:bg-slate-800/80 " + (error ? "border-red-500" : "border-slate-600")}
+                        className={"w-[calc(100%-2px)] min-w-[50px] pl-9 sm:pl-10 pr-2 sm:pr-4 py-2.5 bg-slate-800/50 border rounded-xl text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-sm hover:bg-slate-800/80 appearance-none overflow-hidden text-ellipsis " + (error ? "border-red-500" : "border-slate-600")}
                         {...props}
                     />
                 </div>
@@ -634,32 +634,28 @@
                                         hint="5–25 aksara, huruf/nombor/sempang sahaja"
                                     />
 
-                                    <div className="flex w-full gap-3 sm:gap-4">
-                                        <div className="w-1/2 min-w-0">
-                                            <InputField
-                                                label="Tarikh Lahir"
-                                                name="tarikhLahir"
-                                                value={formData.tarikhLahir}
-                                                onChange={handleChange}
-                                                type="date"
-                                                icon="calendar"
-                                                max={todayDate}
-                                                min="1900-01-01"
-                                                error={errors.tarikhLahir}
-                                                hint="Format: DD-MM-YYYY"
-                                            />
-                                        </div>
-                                        <div className="w-1/2 min-w-0">
-                                            <SelectField
-                                                label="Jantina / Gender"
-                                                name="jantina"
-                                                value={formData.jantina}
-                                                onChange={handleChange}
-                                                icon="users"
-                                                options={["Lelaki (Male)", "Perempuan (Female)"]}
-                                                error={errors.jantina}
-                                            />
-                                        </div>
+                                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                                        <InputField
+                                            label="Tarikh Lahir"
+                                            name="tarikhLahir"
+                                            value={formData.tarikhLahir}
+                                            onChange={handleChange}
+                                            type="date"
+                                            icon="calendar"
+                                            max={todayDate}
+                                            min="1900-01-01"
+                                            error={errors.tarikhLahir}
+                                            hint="Format: DD-MM-YYYY"
+                                        />
+                                        <SelectField
+                                            label="Jantina / Gender"
+                                            name="jantina"
+                                            value={formData.jantina}
+                                            onChange={handleChange}
+                                            icon="users"
+                                            options={["Lelaki (Male)", "Perempuan (Female)"]}
+                                            error={errors.jantina}
+                                        />
                                     </div>
 
                                     <InputField
