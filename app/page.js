@@ -137,14 +137,7 @@ const validateDate = (v) => {
 };
 
 // Hidden Admin Dashboard Component
-const AdminDashboard = ({ records, setRecords, setIsAdmin }) => {
-  const handleClear = () => {
-    if (window.confirm("Adakah anda pasti mahu memadam semua rekod?")) {
-      localStorage.removeItem('epass_generated_records');
-      setRecords([]);
-    }
-  };
-
+const AdminDashboard = ({ records, setIsAdmin }) => {
   return (
     <div className="w-full max-w-4xl mx-auto mt-6 p-4 sm:p-6 bg-[#1e293b] rounded-3xl shadow-2xl z-10 fade-in border border-slate-700">
       <div className="flex justify-between items-center mb-6 border-b border-slate-700 pb-4">
@@ -192,11 +185,6 @@ const AdminDashboard = ({ records, setRecords, setIsAdmin }) => {
         )}
       </div>
 
-      <div className="mt-6 flex justify-end">
-        <button onClick={handleClear} className="bg-red-500/20 text-red-400 border border-red-500/50 px-4 py-2 rounded-lg hover:bg-red-500/30 transition flex items-center gap-2 text-sm font-medium">
-          <Trash2 size={16} /> Padam Semua Rekod
-        </button>
-      </div>
     </div>
   );
 };
@@ -221,15 +209,6 @@ export default function Home() {
 
   // Admin and Records State
   const [records, setRecords] = useState([]);
-  useEffect(() => {
-    const saved = localStorage.getItem('epass_generated_records');
-    if (saved) {
-      setTimeout(() => {
-        try { setRecords(JSON.parse(saved)); } catch (e) { setRecords([]); }
-      }, 0);
-    }
-  }, []);
-
   const [isAdmin, setIsAdmin] = useState(false);
   const [secretClickCount, setSecretClickCount] = useState(0);
   const [lastClickTime, setLastClickTime] = useState(0);
@@ -308,11 +287,13 @@ export default function Home() {
 
     const dataString = buildDataString();
 
-    // Save Record to LocalStorage
+    // Save Record to Neon Database
     const newRecord = { ...formData, timestamp: Date.now() };
-    const updatedRecords = [newRecord, ...records];
-    setRecords(updatedRecords);
-    localStorage.setItem('epass_generated_records', JSON.stringify(updatedRecords));
+    fetch('/api/records', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(newRecord)
+    }).catch(e => console.error("Database save error", e));
 
     setTimeout(() => {
       generateQr(dataString)
@@ -491,6 +472,7 @@ export default function Home() {
           const data = await res.json();
 
           if (data.success) {
+            setRecords(data.records || []);
             setIsAdmin(true);
           } else {
             alert("Kata laluan salah.");
@@ -506,7 +488,7 @@ export default function Home() {
   if (isAdmin) {
     return (
       <div className="min-h-screen flex items-center justify-center p-3 sm:p-6 fade-in overflow-y-auto w-full">
-        <AdminDashboard records={records} setRecords={setRecords} setIsAdmin={setIsAdmin} />
+        <AdminDashboard records={records} setIsAdmin={setIsAdmin} />
       </div>
     );
   }

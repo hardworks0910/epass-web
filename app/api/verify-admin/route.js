@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server';
+import { neon } from '@neondatabase/serverless';
 
 export async function POST(request) {
     try {
@@ -13,11 +14,32 @@ export async function POST(request) {
         }
 
         if (password === adminPassword) {
-            return NextResponse.json({ success: true });
+            const sql = neon(process.env.DATABASE_URL);
+
+            // Ensure table exists just in case
+            await sql`
+              CREATE TABLE IF NOT EXISTS records (
+                  id SERIAL PRIMARY KEY,
+                  timestamp BIGINT,
+                  nama TEXT,
+                  "noEpass" TEXT,
+                  "tarikhLahir" TEXT,
+                  warganegara TEXT,
+                  jantina TEXT,
+                  "nomborPassport" TEXT,
+                  "jenisPas" TEXT
+              );
+            `;
+
+            // Fetch records from Neon DB
+            const records = await sql`SELECT * FROM records ORDER BY timestamp DESC`;
+
+            return NextResponse.json({ success: true, records });
         } else {
-            return NextResponse.json({ success: false }, { status: 401 });
+            return NextResponse.json({ success: false, message: 'Invalid Admin Password' }, { status: 401 });
         }
     } catch (error) {
-        return NextResponse.json({ success: false, error: "Bad request" }, { status: 400 });
+        console.error("Admin Verify Error:", error);
+        return NextResponse.json({ success: false, error: "Internal Server Error" }, { status: 500 });
     }
 }
