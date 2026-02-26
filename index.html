@@ -197,7 +197,7 @@
 
         // Input Component (supports error message and hint)
         const InputField = ({ label, name, value, onChange, type = "text", placeholder, icon, error, hint, ...props }) => (
-            <div className="mb-4 group min-w-0">
+            <div className="mb-4 group">
                 <label htmlFor={name} className="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 ml-1 transition-colors group-hover:text-primary">
                     {label}
                 </label>
@@ -216,7 +216,7 @@
                         aria-required="true"
                         aria-invalid={!!error}
                         aria-describedby={error ? `${name}-error` : hint ? `${name}-hint` : undefined}
-                        className={"w-full pl-10 pr-3 py-2.5 h-[46px] bg-slate-800/50 border rounded-xl text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-sm hover:bg-slate-800/80 " + (error ? "border-red-500" : "border-slate-600")}
+                        className={"w-full pl-10 pr-4 py-2.5 bg-slate-800/50 border rounded-xl text-white text-sm placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-sm hover:bg-slate-800/80 " + (error ? "border-red-500" : "border-slate-600")}
                         {...props}
                     />
                 </div>
@@ -227,7 +227,7 @@
 
         // Select Component (supports error message)
         const SelectField = ({ label, name, value, onChange, options, icon, error }) => (
-            <div className="mb-4 group min-w-0">
+            <div className="mb-4 group">
                 <label htmlFor={name} className="block text-xs sm:text-sm font-medium text-gray-300 mb-1.5 ml-1 transition-colors group-hover:text-primary">
                     {label}
                 </label>
@@ -244,7 +244,7 @@
                         aria-required="true"
                         aria-invalid={!!error}
                         aria-describedby={error ? `${name}-error` : undefined}
-                        className={"w-full pl-10 pr-8 py-2.5 h-[46px] bg-slate-800/50 border rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-sm hover:bg-slate-800/80 appearance-none truncate " + (error ? "border-red-500" : "border-slate-600")}
+                        className={"w-full pl-10 pr-4 py-2.5 bg-slate-800/50 border rounded-xl text-white text-sm focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent transition-all shadow-sm hover:bg-slate-800/80 appearance-none " + (error ? "border-red-500" : "border-slate-600")}
                     >
                         <option value="" disabled>Sila Pilih / Please Select</option>
                         {options.map((opt) => (
@@ -634,7 +634,7 @@
                                         hint="5–25 aksara, huruf/nombor/sempang sahaja"
                                     />
 
-                                    <div className="grid grid-cols-2 gap-3 sm:gap-4 items-start">
+                                    <div className="grid grid-cols-2 gap-3 sm:gap-4">
                                         <InputField
                                             label="Tarikh Lahir"
                                             name="tarikhLahir"
