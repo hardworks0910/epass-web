@@ -318,6 +318,71 @@
             return null;
         };
 
+        // Hidden Admin Dashboard Component
+        const AdminDashboard = ({ records, setRecords, setIsAdmin }) => {
+            const handleClear = () => {
+                if (window.confirm("Adakah anda pasti mahu memadam semua rekod?")) {
+                    localStorage.removeItem('epass_generated_records');
+                    setRecords([]);
+                }
+            };
+
+            return (
+                <div className="w-full max-w-4xl mx-auto mt-6 p-4 sm:p-6 bg-[#1e293b] rounded-3xl shadow-2xl z-10 fade-in border border-slate-700">
+                    <div className="flex justify-between items-center mb-6 border-b border-slate-700 pb-4">
+                        <div className="flex items-center gap-3">
+                            <Icon name="database" size={24} className="text-secondary" />
+                            <h2 className="text-xl font-bold text-white">Rekod e-Pass Jana (Admin)</h2>
+                        </div>
+                        <button onClick={() => setIsAdmin(false)} className="bg-slate-700 text-white px-4 py-2 rounded-lg text-sm hover:bg-slate-600 transition flex items-center gap-2">
+                            <Icon name="x" size={16} /> Tutup
+                        </button>
+                    </div>
+
+                    <div className="overflow-x-auto rounded-xl border border-slate-700 bg-slate-800">
+                        {records.length === 0 ? (
+                            <p className="text-slate-400 text-center py-8">Tiada rekod ditemui.</p>
+                        ) : (
+                            <table className="min-w-full text-sm text-left">
+                                <thead className="bg-slate-900 text-slate-300">
+                                    <tr>
+                                        <th className="py-3 px-4 font-semibold">Tarikh/Masa</th>
+                                        <th className="py-3 px-4 font-semibold">Nama</th>
+                                        <th className="py-3 px-4 font-semibold">No ePass</th>
+                                        <th className="py-3 px-4 font-semibold">Passport</th>
+                                        <th className="py-3 px-4 font-semibold">Tarikh Lahir</th>
+                                        <th className="py-3 px-4 font-semibold">Warganegara</th>
+                                        <th className="py-3 px-4 font-semibold">Jantina</th>
+                                        <th className="py-3 px-4 font-semibold">Jenis Pas</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-700">
+                                    {records.map((r, i) => (
+                                        <tr key={i} className="hover:bg-slate-700/50 text-slate-200 transition-colors">
+                                            <td className="py-3 px-4 whitespace-nowrap">{new Date(r.timestamp).toLocaleString('ms-MY')}</td>
+                                            <td className="py-3 px-4 font-medium">{r.nama}</td>
+                                            <td className="py-3 px-4 text-primary">{r.noEpass}</td>
+                                            <td className="py-3 px-4 text-accent">{r.nomborPassport}</td>
+                                            <td className="py-3 px-4 whitespace-nowrap">{r.tarikhLahir}</td>
+                                            <td className="py-3 px-4">{r.warganegara}</td>
+                                            <td className="py-3 px-4">{r.jantina}</td>
+                                            <td className="py-3 px-4">{r.jenisPas}</td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        )}
+                    </div>
+
+                    <div className="mt-6 flex justify-end">
+                        <button onClick={handleClear} className="bg-red-500/20 text-red-400 border border-red-500/50 px-4 py-2 rounded-lg hover:bg-red-500/30 transition flex items-center gap-2 text-sm font-medium">
+                            <Icon name="trash-2" size={16} /> Padam Semua Rekod
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
         const App = () => {
             const [isLoading, setIsLoading] = useState(true);
             const [step, setStep] = useState('form'); // form, loading, result, error
@@ -335,6 +400,18 @@
             const [qrUrl, setQrUrl] = useState('');
             const [downloadStatus, setDownloadStatus] = useState('idle'); // idle, generating, success
             const [qrError, setQrError] = useState(null); // network/QR error + retry
+
+            // Admin and Records State
+            const [records, setRecords] = useState(() => {
+                const saved = localStorage.getItem('epass_generated_records');
+                if (saved) {
+                    try { return JSON.parse(saved); } catch (e) { return []; }
+                }
+                return [];
+            });
+            const [isAdmin, setIsAdmin] = useState(false);
+            const [secretClickCount, setSecretClickCount] = useState(0);
+            const [lastClickTime, setLastClickTime] = useState(0);
 
             const canvasRef = useRef(null);
 
@@ -423,6 +500,13 @@
                 setStep('loading');
 
                 const dataString = buildDataString();
+
+                // Save Record to LocalStorage
+                const newRecord = { ...formData, timestamp: Date.now() };
+                const updatedRecords = [newRecord, ...records];
+                setRecords(updatedRecords);
+                localStorage.setItem('epass_generated_records', JSON.stringify(updatedRecords));
+
                 const delay = 800;
                 setTimeout(() => {
                     generateQr(dataString)
@@ -582,6 +666,35 @@
                 );
             }
 
+            const handleSecretClick = () => {
+                const now = Date.now();
+                let count = secretClickCount;
+                if (now - lastClickTime > 1200) {
+                    count = 1;
+                } else {
+                    count += 1;
+                }
+                setLastClickTime(now);
+                setSecretClickCount(count);
+                if (count >= 5) {
+                    setSecretClickCount(0);
+                    const pwd = prompt("Sila masukkan kata laluan / Admin Password:");
+                    if (pwd === "MyEpass!") {
+                        setIsAdmin(true);
+                    } else if (pwd !== null) {
+                        alert("Kata laluan salah.");
+                    }
+                }
+            };
+
+            if (isAdmin) {
+                return (
+                    <div className="min-h-screen flex items-center justify-center p-3 sm:p-6 fade-in overflow-y-auto w-full">
+                        <AdminDashboard records={records} setRecords={setRecords} setIsAdmin={setIsAdmin} />
+                    </div>
+                );
+            }
+
             return (
                 <div className="min-h-screen flex items-center justify-center p-3 sm:p-6 fade-in overflow-y-auto">
                     {/* Render Download Modal */}
@@ -594,7 +707,7 @@
                             <div className="inline-flex items-center justify-center p-3 bg-gradient-to-br from-primary to-secondary rounded-2xl shadow-lg mb-4">
                                 <Icon name="shield-check" size={32} className="text-white" />
                             </div>
-                            <h1 className="text-2xl sm:text-3xl font-bold text-white tracking-tight">e-Pass Portal</h1>
+                            <h1 onClick={handleSecretClick} className="text-2xl sm:text-3xl font-bold text-white tracking-tight cursor-pointer select-none">e-Pass Portal</h1>
                             <p className="text-slate-400 mt-2 text-xs sm:text-sm">Sistem Pendaftaran Digital Selamat</p>
                         </div>
 
