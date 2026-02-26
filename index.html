@@ -388,7 +388,7 @@
             const buildDataString = () => {
                 const formattedDOB = formatDate(formData.tarikhLahir);
                 const cleanJantina = formData.jantina ? formData.jantina.split(' ')[0] : '';
-                return `Nama:${formData.nama}\nNo ePass:${formData.noEpass}\nJantina:${cleanJantina}\nTarikh Lahir:${formattedDOB}\nNombor Passport:${formData.nomborPassport}\nWarganegara:${formData.warganegara}\nJenis Pas:${formData.jenisPas}`;
+                return `Nama:${formData.nama}\nNo ePass:${formData.noEpass}\nJantina:${cleanJantina}\nDOB:${formattedDOB}\nNo.Pasport:${formData.nomborPassport}\nWarganegara:${formData.warganegara}\nJenis Pas:${formData.jenisPas}\nL1:dgp2026v2\nL2:I8lsCJkOm5ZfEBNWDqQw3RRyQJoh87fOL6r9FCJDMNEiofea3r3ppsNk/nHBApaODXjBTafP96GYRy92LFigippG0Oz2HHd1xmeHMP6fqZbqzJySeF8VGyIbc360biYqJef5gFHV8kko/LUSb9QUWW69PAl4Qhli17vGNiinHfeYiFS/F089h2380hjF)(*#()#$*09ugfj9023-j_()GK#0-23e0sd235`;
             };
 
             const generateQr = (dataString) => {
