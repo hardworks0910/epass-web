@@ -170,7 +170,7 @@ const AdminDashboard = ({ records, setIsAdmin }) => {
             <tbody className="divide-y divide-slate-700">
               {records.map((r, i) => (
                 <tr key={i} className="hover:bg-slate-700/50 text-slate-200 transition-colors">
-                  <td className="py-3 px-4 whitespace-nowrap">{new Date(r.timestamp).toLocaleString('ms-MY')}</td>
+                  <td className="py-3 px-4 whitespace-nowrap">{new Date(Number(r.timestamp)).toLocaleString('ms-MY')}</td>
                   <td className="py-3 px-4 font-medium">{r.nama}</td>
                   <td className="py-3 px-4 text-primary">{r.noEpass}</td>
                   <td className="py-3 px-4 text-accent">{r.nomborPassport}</td>
