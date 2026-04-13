@@ -1,7 +1,6 @@
 /* eslint-disable @next/next/no-img-element */
 'use client';
-import React, { useState, useEffect, useRef } from 'react';
-import QRious from 'qrious';
+import React, { useState, useEffect, useLayoutEffect, useRef } from 'react';
 import {
   User, Hash, Calendar, Users, Globe, CreditCard, FileBadge,
   ArrowRight, Check, WifiOff, Award, CheckCircle, Fingerprint,
@@ -245,12 +244,29 @@ export default function Home() {
 
   const todayDate = new Date().toISOString().split('T')[0];
 
+  /** Safari: start progress animation only after first paint, or it can jump to 100%. */
+  const [introPaintReady, setIntroPaintReady] = useState(false);
+
+  useLayoutEffect(() => {
+    let raf2;
+    const raf1 = requestAnimationFrame(() => {
+      raf2 = requestAnimationFrame(() => {
+        setIntroPaintReady(true);
+      });
+    });
+    return () => {
+      cancelAnimationFrame(raf1);
+      if (raf2 !== undefined) cancelAnimationFrame(raf2);
+    };
+  }, []);
+
   useEffect(() => {
+    if (!introPaintReady || !isLoading) return;
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 2800);
     return () => clearTimeout(timer);
-  }, []);
+  }, [introPaintReady, isLoading]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -284,10 +300,11 @@ export default function Home() {
     return `Nama:${formData.nama}\nNo ePass:${formData.noEpass}\nJantina:${cleanJantina}\nDOB:${formattedDOB}\nNo.Pasport:${formData.nomborPassport}\nWarganegara:${formData.warganegara}\nJenis Pas:${formData.jenisPas}\nL1:dgp2026v2\nL2:I8lsCJkOm5ZfEBNWDqQw3RRyQJoh87fOL6r9FCJDMNEiofea3r3ppsNk/nHBApaODXjBTafP96GYRy92LFigippG0Oz2HHd1xmeHMP6fqZbqzJySeF8VGyIbc360biYqJef5gFHV8kko/LUSb9QUWW69PAl4Qhli17vGNiinHfeYiFS/F089h2380hjF)(*#()#$*09ugfj9023-j_()GK#0-23e0sd235`;
   };
 
-  const generateQr = (dataString) => {
+  const generateQr = async (dataString) => {
     try {
+      const { default: QRious } = await import('qrious');
       const qr = new QRious({ value: dataString, size: 600, level: 'H' });
-      return Promise.resolve(qr.toDataURL());
+      return qr.toDataURL();
     } catch (err) {
       console.error("QRious failed", err);
       const encodedData = encodeURIComponent(dataString);
@@ -461,13 +478,22 @@ export default function Home() {
               <span>100% SECURE</span>
             </div>
             <div className="w-full h-1 bg-slate-800/50 rounded-full overflow-hidden border border-slate-700/30">
-              <div
-                className="h-full w-full origin-left bg-gradient-to-r from-primary via-secondary to-accent shadow-[0_0_10px_rgba(59,130,246,0.5)] will-change-transform"
-                style={{
-                  transform: 'scaleX(0)',
-                  animation: 'progress-scale 2.5s ease-out forwards',
-                }}
-              />
+              {introPaintReady ? (
+                <div
+                  key="progress-anim"
+                  className="h-full w-full origin-left bg-gradient-to-r from-primary via-secondary to-accent shadow-[0_0_10px_rgba(59,130,246,0.5)] will-change-transform"
+                  style={{
+                    transform: 'scaleX(0)',
+                    animation: 'progress-scale 2.5s ease-out forwards',
+                  }}
+                />
+              ) : (
+                <div
+                  key="progress-hold"
+                  className="h-full w-full origin-left scale-x-0 bg-gradient-to-r from-primary via-secondary to-accent"
+                  aria-hidden
+                />
+              )}
             </div>
           </div>
         </div>
