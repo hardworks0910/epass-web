@@ -461,10 +461,13 @@ export default function Home() {
               <span>100% SECURE</span>
             </div>
             <div className="w-full h-1 bg-slate-800/50 rounded-full overflow-hidden border border-slate-700/30">
-              <div className="h-full bg-gradient-to-r from-primary via-secondary to-accent shadow-[0_0_10px_rgba(59,130,246,0.5)]" style={{
-                width: '0%',
-                animation: 'progress 2.5s ease-out forwards'
-              }}></div>
+              <div
+                className="h-full w-full origin-left bg-gradient-to-r from-primary via-secondary to-accent shadow-[0_0_10px_rgba(59,130,246,0.5)] will-change-transform"
+                style={{
+                  transform: 'scaleX(0)',
+                  animation: 'progress-scale 2.5s ease-out forwards',
+                }}
+              />
             </div>
           </div>
         </div>

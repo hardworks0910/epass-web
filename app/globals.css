@@ -34,11 +34,17 @@
   }
 }
 
-/* Loading Bar Animation */
-@keyframes progress {
-  0% { width: 0%; }
-  50% { width: 70%; }
-  100% { width: 100%; }
+/* Loading bar: scaleX animates on GPU (smoother on iOS Safari than width) */
+@keyframes progress-scale {
+  0% {
+    transform: scaleX(0);
+  }
+  50% {
+    transform: scaleX(0.7);
+  }
+  100% {
+    transform: scaleX(1);
+  }
 }
 
 /* Checkmark Animation */
