@@ -27,9 +27,14 @@ export async function POST(request) {
                   warganegara TEXT,
                   jantina TEXT,
                   "nomborPassport" TEXT,
-                  "jenisPas" TEXT
+                  "jenisPas" TEXT,
+                  "deviceId" TEXT,
+                  "userAgent" TEXT
               );
             `;
+
+            await sql`ALTER TABLE records ADD COLUMN IF NOT EXISTS "deviceId" TEXT`;
+            await sql`ALTER TABLE records ADD COLUMN IF NOT EXISTS "userAgent" TEXT`;
 
             // Fetch records from Neon DB
             const records = await sql`SELECT * FROM records ORDER BY timestamp DESC`;

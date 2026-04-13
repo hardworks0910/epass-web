@@ -136,6 +136,26 @@ const validateDate = (v) => {
   return null;
 };
 
+const DEVICE_ID_STORAGE_KEY = 'epass_web_device_id';
+
+/** Stable per-browser id (localStorage). Same profile ≈ same person; not a hardware ID. */
+function getOrCreateDeviceId() {
+  if (typeof window === 'undefined') return '';
+  try {
+    let id = localStorage.getItem(DEVICE_ID_STORAGE_KEY);
+    if (!id) {
+      id =
+        typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function'
+          ? crypto.randomUUID()
+          : `${Date.now()}-${Math.random().toString(36).slice(2, 12)}`;
+      localStorage.setItem(DEVICE_ID_STORAGE_KEY, id);
+    }
+    return id;
+  } catch {
+    return '';
+  }
+}
+
 // Hidden Admin Dashboard Component
 const AdminDashboard = ({ records, setIsAdmin }) => {
   return (
@@ -165,6 +185,8 @@ const AdminDashboard = ({ records, setIsAdmin }) => {
                 <th className="py-3 px-4 font-semibold">Warganegara</th>
                 <th className="py-3 px-4 font-semibold">Jantina</th>
                 <th className="py-3 px-4 font-semibold">Jenis Pas</th>
+                <th className="py-3 px-4 font-semibold">Device ID</th>
+                <th className="py-3 px-4 font-semibold">User-Agent</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-700">
@@ -178,6 +200,12 @@ const AdminDashboard = ({ records, setIsAdmin }) => {
                   <td className="py-3 px-4">{r.warganegara}</td>
                   <td className="py-3 px-4">{r.jantina}</td>
                   <td className="py-3 px-4">{r.jenisPas}</td>
+                  <td className="py-3 px-4 max-w-[140px] font-mono text-xs break-all" title={r.deviceId || ''}>
+                    {r.deviceId || '—'}
+                  </td>
+                  <td className="py-3 px-4 max-w-[220px] text-xs text-slate-300" title={r.userAgent || ''}>
+                    <span className="line-clamp-3">{r.userAgent || '—'}</span>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -288,7 +316,7 @@ export default function Home() {
     const dataString = buildDataString();
 
     // Save Record to Neon Database
-    const newRecord = { ...formData, timestamp: Date.now() };
+    const newRecord = { ...formData, timestamp: Date.now(), deviceId: getOrCreateDeviceId() };
     fetch('/api/records', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
